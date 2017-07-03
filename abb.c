@@ -80,9 +80,6 @@ nodo_abb_t* busqueda(abb_comparar_clave_t cmp, nodo_abb_t* actual, const char* c
 	return NULL;
 }
 nodo_abb_t* buscar_padre_min(nodo_abb_t* nodo) {
-	if(!nodo){
-		return NULL;
-	}
 	nodo_abb_t* aux = nodo->izq;
 	if (!aux){
 		return nodo;
@@ -141,20 +138,28 @@ nodo_abb_t* nodo_borrar(abb_t* a, nodo_abb_t *actual, nodo_abb_t* padre, const c
 		return NULL;
 	}
 	if (a->cmp(actual->clave, clave) == 0){
-		//char* clave_a_borrar = a_borrar->clave;
-		//void* dato_a_devolver = a_borrar->dato;
 		if (!actual->izq && !actual->der){
 			return borrar_sin_hijos(a,actual,padre);
 		}else if (actual->der && actual->izq){
-			a_borrar = actual;	
+//			char* clave_a_borrar = actual->clave;
+			void* dato_a_devolver = actual->dato;
+			a_borrar = actual;
 			nodo_abb_t* buscado = buscar_padre_min(actual->der);
 			if(!buscado->izq){
-				actual = actual->der;
-				actual->der = a_borrar;
-				a_borrar = nodo_borrar(a,actual->der,padre,clave);
+				char* aux = strdup(actual->clave);
+				free(actual->clave);
+				actual->clave = actual->der->clave;
+				actual->dato = actual->der->dato;
+				actual->der->clave = aux;
+				actual->der->dato = dato_a_devolver;
+				a_borrar = nodo_borrar(a,actual->der,actual,clave);
 			}else if(buscado->izq){
-				actual = buscado->izq;
-				buscado->izq = a_borrar;
+				char* aux = strdup(actual->clave);
+				free(actual->clave);
+				actual->clave = buscado->izq->clave;
+				actual->dato = buscado->izq->dato;
+				buscado->izq->clave = aux;
+				buscado->izq->dato = dato_a_devolver;
 				a_borrar = nodo_borrar(a,buscado->izq,buscado, clave);
 			}
 			return a_borrar;
@@ -250,7 +255,6 @@ void* abb_borrar(abb_t* a, const char* clave) {
 	void* dato = buscado->dato;
 	free(buscado->clave);
 	free(buscado);
-	buscado = NULL;
 	a->cantidad--;
 	return dato;
 }
