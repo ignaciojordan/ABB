@@ -284,10 +284,23 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol) {
 	}
 	iterador->pila = aux2;
 	nodo_abb_t* aux = arbol->raiz;
-	while (aux) {
-		pila_apilar(iterador->pila,aux);
+	bool fin = false;// a partir de hasta lo siguiente que marque es la modificacion para el tp2
+	while (!fin && aux) {
+		int comparacion = arbol->cmp(aux->clave,inicio);
+		if(comparacion == 0){
+			pila_apilar(iterador->pila,aux);
+			fin = true;
+		}else if(comparacion > 0){
+			pila_apilar(iterador->pila,aux);
+			aux = aux->izq;
+		}else{
+			aux = aux->der;
+		}
+	}// hasta aca despues en tu .h podes cambiar la firma de esta funcion por abb_iter_t *abb_iter_in_crear(const abb_t *arbol, char* inicio);
+	/*while (aux) {
+		pila_apilar(iterador->pila,aux); esto comentado es el iterador sin cambios
 		aux = aux->izq;
-	}	
+	}*/	
 	return iterador;
 }
 
